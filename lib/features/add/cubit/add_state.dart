@@ -1,4 +1,4 @@
-part of 'add_cubit.dart';
+ part of 'add_cubit.dart';
 
 class AddState {
   const AddState({
