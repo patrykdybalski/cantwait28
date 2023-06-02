@@ -1,5 +1,6 @@
 import 'package:cantwait28/features/add/page/add_page.dart';
 import 'package:cantwait28/features/home/cubit/home_cubit.dart';
+import 'package:cantwait28/models/item_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,8 +43,8 @@ class _HomePageBody extends StatelessWidget {
       create: (context) => HomeCubit()..start(),
       child: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
-          final docs = state.items?.docs;
-          if (docs == null) {
+          final itemModels = state.items;
+          if (itemModels.isEmpty) {
             return const SizedBox.shrink();
           }
           return ListView(
@@ -51,9 +52,9 @@ class _HomePageBody extends StatelessWidget {
               vertical: 20,
             ),
             children: [
-              for (final doc in docs)
+              for (final itemModel in itemModels)
                 Dismissible(
-                  key: ValueKey(doc.id),
+                  key: ValueKey(itemModel.id),
                   background: const DecoratedBox(
                     decoration: BoxDecoration(
                       color: Colors.red,
@@ -73,10 +74,10 @@ class _HomePageBody extends StatelessWidget {
                     return direction == DismissDirection.endToStart;
                   },
                   onDismissed: (direction) {
-                    context.read<HomeCubit>().remove(documentID: doc.id);
+                    context.read<HomeCubit>().remove(documentID: itemModel.id);
                   },
                   child: _ListViewItem(
-                    document: doc,
+                    document: itemModel,
                   ),
                 ),
             ],
@@ -93,7 +94,7 @@ class _ListViewItem extends StatelessWidget {
     required this.document,
   }) : super(key: key);
 
-  final QueryDocumentSnapshot<Map<String, dynamic>> document;
+  final ItemModel document;
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +115,7 @@ class _ListViewItem extends StatelessWidget {
                 color: Colors.black12,
                 image: DecorationImage(
                   image: NetworkImage(
-                    document['image_url'],
+                    document.imageURL,
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -130,18 +131,14 @@ class _ListViewItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          document['title'],
+                          document.title,
                           style: const TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text(
-                          (document['release_date'] as Timestamp)
-                              .toDate()
-                              .toString(),
-                        ),
+                        Text(document.relaseDate.toString()),
                       ],
                     ),
                   ),
