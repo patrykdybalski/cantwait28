@@ -1,7 +1,7 @@
 import 'package:cantwait28/features/add/page/add_page.dart';
 import 'package:cantwait28/features/home/cubit/home_cubit.dart';
 import 'package:cantwait28/models/item_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cantwait28/repositories/items_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -40,7 +40,7 @@ class _HomePageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeCubit()..start(),
+      create: (context) => HomeCubit(ItemsRepository())..start(),
       child: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
           final itemModels = state.items;
@@ -77,7 +77,7 @@ class _HomePageBody extends StatelessWidget {
                     context.read<HomeCubit>().remove(documentID: itemModel.id);
                   },
                   child: _ListViewItem(
-                    document: itemModel,
+                    itemModel: itemModel,
                   ),
                 ),
             ],
@@ -91,10 +91,10 @@ class _HomePageBody extends StatelessWidget {
 class _ListViewItem extends StatelessWidget {
   const _ListViewItem({
     Key? key,
-    required this.document,
+    required this.itemModel,
   }) : super(key: key);
 
-  final ItemModel document;
+  final ItemModel itemModel;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +115,7 @@ class _ListViewItem extends StatelessWidget {
                 color: Colors.black12,
                 image: DecorationImage(
                   image: NetworkImage(
-                    document.imageURL,
+                    itemModel.imageURL,
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -131,14 +131,14 @@ class _ListViewItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          document.title,
+                          itemModel.title,
                           style: const TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text(document.relaseDate.toString()),
+                        Text(itemModel.releaseDate.toString()),
                       ],
                     ),
                   ),
@@ -150,15 +150,15 @@ class _ListViewItem extends StatelessWidget {
                   margin: const EdgeInsets.all(10),
                   padding: const EdgeInsets.all(10),
                   child: Column(
-                    children: const [
+                    children: [
                       Text(
-                        '0',
-                        style: TextStyle(
+                        itemModel.daysLeft(),
+                        style: const TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text('days left'),
+                      const Text('days left'),
                     ],
                   ),
                 ),
